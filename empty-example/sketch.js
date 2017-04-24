@@ -71,6 +71,8 @@ function createMap() {
 	for (var i = 0; i < numRows; i++) {
 		for (var j = 0; j < rowLength; j++) {
 			var hexCoord = [j, row];
+			console.log('hexCoords');
+			console.log(hexCoord);
 			axialHexMap.push(hexCoord);
 		}
 		row += 1;
@@ -78,7 +80,12 @@ function createMap() {
 	//console.log('axial hex map array ' + axialHexMap);
 }
 
+/*
 
+FOR SOME REASON (??????) THIS CODE BELOW CREATES A HEX MAP LIKE THE 
+ONE REPRESENTED ONE THE SCREEN (UPSIDE DOWNISH). AND 
+
+*/
 
 function convertAxialArrayToCubeArray (array){
 	//write a function that creates a new array in cube 
@@ -88,8 +95,10 @@ function convertAxialArrayToCubeArray (array){
 		var axialHexObject = Axial(array[i][0], array[i][1]);
 
 		cubeArray.push(axialToCube(axialHexObject))
+		// console.log(cubeArray[i].q, cubeArray[i].r, cubeArray[i].s);
+		// console.log(hexToPixel(axialToCube(axialHexObject)));
 	}
-	console.log(cubeArray);
+	//console.log(cubeArray);
 	return cubeArray;
 	
 
@@ -103,6 +112,9 @@ var cubeMap = convertAxialArrayToCubeArray(axialHexMap);
 This code creates map of the cubeoidal coordinates, and convertCubeMapArrayToPixel
 should create a new array that substitutes the cubeoidal hex coordinates to 
 pixel coordinates.
+
+ERROR FROM CONVERTAXIALTOCUBE IS CARRYING OVER TO THIS FUNCTION
+
 **/
 
 
@@ -112,9 +124,11 @@ pixel coordinates.
 		for (var i = 0; i < array.length; i++) {
 			var hexCubeObject = Hex(array[i].q, array[i].r, array[i].s);
 			var pixelPositionObject = hexToPixel(hexCubeObject);
-			pixelPositionObject.x += 900;
-			pixelPositionObject.y += 900;
+			pixelPositionObject.x = pixelPositionObject.x + 900 ;
+			pixelPositionObject.y = pixelPositionObject.y + 900;
 			pixelArray.push(pixelPositionObject);
+			//console.log(hexCubeObject);
+			//console.log(pixelArray[i]);
 		}
 		return pixelArray;
 	}
@@ -156,11 +170,14 @@ var pixelMap = convertCubeMapArrayToPixel(cubeMap);
 	I dont understand how hex_roudn works. I know what it does.
 	*/ 
 
+
+//this 
 	function hex_round(h)
 	{
 	    var q = Math.trunc(Math.round(h.q));
 	    var r = Math.trunc(Math.round(h.r));
 	    var s = Math.trunc(Math.round(h.s));
+	    console.log('h.s: ' + h.s);
 	    var q_diff = Math.abs(q - h.q);
 	    var r_diff = Math.abs(r - h.r);
 	    var s_diff = Math.abs(s - h.s);
@@ -180,10 +197,11 @@ var pixelMap = convertCubeMapArrayToPixel(cubeMap);
 	    return Hex(q, r, s);
 	}
 
+//CHECK THIS CODE!!!!!!!! THIS IS WHAT'S NOT WORKING
 	function pixelToCubeHex(x, y){
 	    q = (x * Math.sqrt(3)/3 - y / 3) / sizeOfHexInPixels;
 	    r = y * 2/3 / sizeOfHexInPixels;
-	    return hex_round(Hex(q, r));
+	    return hex_round(axialToCube(Axial(q, r)));
 	}
 
 /*
@@ -222,7 +240,7 @@ is selected through a click. This is what we'll use to
 			var cs = cubeMap[i].s
 			//console.log(q,r,s,cq,cr,cs);
 			if(q == cq && r == cr && s == cs){
-				console.log('condition met');
+				//console.log('condition met');
 				return cubeMap[i];
 			}
 		}
@@ -232,6 +250,7 @@ is selected through a click. This is what we'll use to
 function setup() {
 	createCanvas(1200,1200);
 
+	
 	for (var i = 0; i < pixelMap.length; i++) {
 		pixelCenter = Point(pixelMap[i].x, pixelMap[i].y);
 		//console.log('Pixel x: ' + pixelMap[i].x);
@@ -242,7 +261,7 @@ function setup() {
 
 	function drawHex(hexCenter){
 		var corner = hexCorner(hexCenter, 40, 0);
-		console.log(corner);
+		//console.log(corner);
 		var corner2 = hexCorner(hexCenter, 40, 1);
 		var corner3 = hexCorner(hexCenter, 40, 2);
 		var corner4 = hexCorner(hexCenter, 40, 3);
@@ -275,7 +294,8 @@ function draw() {
 
 	
 function mousePressed(){
-	var loc = pixelToCubeHex(mouseX-900, mouseY-900);
+	var loc = pixelToCubeHex(mouseX, mouseY);
+	console.log(mouseX, mouseY);
 	console.log(checkHexAgainstCubeArray(loc));
 
 	return false;
